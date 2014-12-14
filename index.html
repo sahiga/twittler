@@ -5,21 +5,50 @@
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
     <link href="twittler.css" rel="stylesheet" type="text/css" />
-    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+    <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   </head>
   <body>
-    <div id="more-tweets">Waiting for new tweets...</div>
-    <div id="clear-filter">Clear user filter</div>
+    <header>
+      <h1><span class="fa fa-twitter"></span> Twittler</h1>
+    </header>
+    <section class="alerts">
+      <div id="more-tweets">Waiting for new tweets...</div>
+      <div id="clear-filter"><span class="fa fa-times"></span> Clear user filter</div>
+    </section>
     <section id="tweet-container">
     </section>
     <script type="text/javascript">
       $(document).ready(function(){
 
         var tweetEvents = (function() {
+          // Check current number of tweets
           function counter() {
             return streams.home.length;
           }
 
+          // Grab current displayed tweets
+          function getDisplayedTweets() {
+            return $('.tweet');
+          }
+
+          function colorRows(tweets) {
+            // Grab all tweets in DOM if no tweet list is provided
+            if (typeof tweets === 'undefined') {
+              var tweets = this.getDisplayedTweets();
+            }
+
+            // Color odd rows blue
+            for (var j = 0; j < tweets.length; j++) {
+              if (j % 2 !== 0) {
+                tweets.eq(j).addClass('blue');
+              } else {
+                tweets.eq(j).removeClass('blue');
+              }
+            }
+          }
+
+          // Add a tweet to the DOM
           function displayIndividualTweet(number) {
             var tweet = streams.home[number];
             var $tweet = $('<div class="tweet"><p class="date">' +
@@ -31,12 +60,19 @@
             $tweet.animate({'opacity': '1'}, 'slow');
           }
 
+          // Display new tweets and mark them as read
           function displayNewTweets() {
             for (var i = originalTweetCount; i < newTweetCount; i++) {
               displayIndividualTweet(i);
               read[i] = true;
             }
+
+            // Update tweet count
             originalTweetCount = newTweetCount;
+            // Attach click handler to new elements with the class "user"
+            this.updateUserList($('.user'));
+            this.colorRows();
+            // Change content of $moreTweets back to original message
             $moreTweets.html('Waiting for new tweets...');
           }
 
@@ -47,39 +83,69 @@
 
             // If current count is greater than original count
             if (newTweetCount > originalTweetCount) {
-              // Display moreTweets alert with number of new tweets
+              // Display $moreTweets alert with number of new tweets
               $moreTweets
-                .html('You have <strong>' + (newTweetCount - originalTweetCount) + '</strong> new tweets. Click to show them.');
+                .html('You have <strong>' + (newTweetCount - originalTweetCount) +
+                '</strong> new tweets. Click to show them.');
             }
 
+            // Call checkForTweets() every 6000 ms
             setTimeout(function() {
-              checkForTweets(counter());
-            }, Math.random() * 8000);
+              checkForTweets();
+            }, 6000);
           };
 
+          // Filter tweets by user
           function filterByUser(user) {
-            var tweets = $('.tweet');
+            var tweets = this.getDisplayedTweets();
 
+            // For each tweet, determine whether the user signature
+            // is equal to the provided user
             for (var j = 0; j < tweets.length; j++) {
               var currentUser = tweets.eq(j).find('.user').text().trim();
-              if (currentUser !== user) {
-                tweets.eq(j).slideUp();
+              // If so, mark it as filtered
+              if (currentUser === user) {
+                tweets.eq(j).addClass('filtered');
+              // If not, remove the filtered class and hide the tweet
+              } else {
+                tweets.eq(j).removeClass('filtered').slideUp();
               }
             }
-            $clearFilter.slideDown();
+
+            // Display the "clear filter" button
+            $clearFilter.css('display', 'block');
+
+            // Recolor rows for filtered tweets
+            this.colorRows($('.filtered'));
           };
 
+          // Attach click handler to current elements with the class "user"
+          // Note: this needs to be called every time new tweets are added
+          // to the DOM so that filterByUser() works for every tweet
+          function updateUserList(users) {
+            users.click(function() {
+              var user = $(this).text().trim();
+              tweetEvents.filterByUser(user);
+            });
+          };
+
+          // Clear the user filter
           function clearFilter() {
             $('.tweet').css('display', 'block');
             $clearFilter.css('display', 'none');
+            this.colorRows();
           }
 
+          // Return an object referencing the above functions
           return {
             counter: counter,
+            getDisplayedTweets: getDisplayedTweets,
+            colorRows: colorRows,
             displayIndividualTweet: displayIndividualTweet,
             displayNewTweets: displayNewTweets,
             checkForTweets: checkForTweets,
             filterByUser: filterByUser,
+            updateUserList: updateUserList,
             clearFilter: clearFilter
           };
         })();
@@ -89,6 +155,7 @@
         var $moreTweets = $('#more-tweets');
         var $clearFilter = $('#clear-filter');
 
+        // Initialize the two tweet count variables
         var newTweetCount = 0;
         var originalTweetCount = tweetEvents.counter();
 
@@ -98,7 +165,7 @@
         // Start index at the original number of tweets
         var index = streams.home.length - 1;
 
-        // Display first 10 tweets on page load
+        // Display first 11 tweets on page load
         while (index >= 0) {
           var newTweet = tweetEvents.displayIndividualTweet(index);
 
@@ -112,21 +179,23 @@
         // Start checking for new tweets
         tweetEvents.checkForTweets();
 
+        // Attach click handler to the first 11 elements with the class "user"
+        tweetEvents.updateUserList($('.user'));
+
+        // Color rows
+        tweetEvents.colorRows();
+
+        // Display new tweets when $moreTweets alert is clicked
         $moreTweets.click(function() {
           tweetEvents.displayNewTweets();
-        });
-
-        $('.tweet').click(function() {
-          var user = $(this).find('.user').text().trim();
-          tweetEvents.filterByUser(user);
-        });
-
-        $clearFilter.click(function() {
           tweetEvents.clearFilter();
         });
 
+        // Clear user filter when $clearFilter button is clicked
+        $clearFilter.click(function() {
+          tweetEvents.clearFilter();
+        });
       });
-
     </script>
   </body>
 </html>

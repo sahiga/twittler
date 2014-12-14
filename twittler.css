@@ -65,10 +65,27 @@ strong, .user {
   font-weight: 700;
 }
 
+header {
+  padding: 1em;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+.alerts {
+  position: relative;
+}
+
 .tweet {
   opacity: 0;
   padding: 1em;
-  border-bottom: 1px solid rgba(0, 132, 180, 0.5);
+  display: block;
+  border-bottom: 1px dotted rgba(0, 132, 180, 0.5);
+}
+
+.blue {
+  background: rgb(232, 249, 255);
 }
 
 #more-tweets {
@@ -76,6 +93,7 @@ strong, .user {
   font-size: 0.8em;
   padding: 0.5em 1em;
   background: #ffffcc;
+  border-top: 1px solid rgb(255, 240, 158);
   border-bottom: 1px solid rgb(255, 240, 158);
 }
 
