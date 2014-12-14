@@ -1,0 +1,105 @@
+/* http://meyerweb.com/eric/tools/css/reset/
+v2.0 | 20110126
+License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  line-height: 1.8em;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-spacing: 0;
+}
+
+/* Custom */
+body {
+  font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #222;
+}
+
+a {
+  color: rgba(0, 132, 180, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a:hover {
+  color: rgba(0, 132, 180, 0.5);
+}
+
+strong, .user {
+  font-weight: 700;
+}
+
+.tweet {
+  opacity: 0;
+  padding: 1em;
+  border-bottom: 1px solid rgba(0, 132, 180, 0.5);
+}
+
+#more-tweets {
+  cursor: pointer;
+  font-size: 0.8em;
+  padding: 0.5em 1em;
+  background: #ffffcc;
+  border-bottom: 1px solid rgb(255, 240, 158);
+}
+
+#clear-filter {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0.5em;
+  padding: 0.2em 0.8em;
+  font-size: 0.7em;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(0, 132, 180, 1);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.date {
+  font-size: 0.7em;
+}
+
+.message {
+  font-weight: 300;
+  font-size: 1.4em;
+}

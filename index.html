@@ -1,24 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf8">
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <link href="twittler.css" rel="stylesheet" type="text/css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
   </head>
   <body>
-    <script>
-
+    <div id="more-tweets">Waiting for new tweets...</div>
+    <div id="clear-filter">Clear user filter</div>
+    <section id="tweet-container">
+    </section>
+    <script type="text/javascript">
       $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
 
+        var tweetEvents = (function() {
+          function counter() {
+            return streams.home.length;
+          }
+
+          function displayIndividualTweet(number) {
+            var tweet = streams.home[number];
+            var $tweet = $('<div class="tweet"><p class="date">' +
+            tweet.created_at + '</p><p class="message">' + tweet.message +
+            '</p><p class="posted-by">&mdash; <a class="user">@' +
+            tweet.user + '</a></div>');
+
+            $tweet.prependTo($tweetContainer);
+            $tweet.animate({'opacity': '1'}, 'slow');
+          }
+
+          function displayNewTweets() {
+            for (var i = originalTweetCount; i < newTweetCount; i++) {
+              displayIndividualTweet(i);
+              read[i] = true;
+            }
+            originalTweetCount = newTweetCount;
+            $moreTweets.html('Waiting for new tweets...');
+          }
+
+          // Check for new tweets periodically
+          function checkForTweets() {
+            // Check the current tweet count
+            newTweetCount = counter();
+
+            // If current count is greater than original count
+            if (newTweetCount > originalTweetCount) {
+              // Display moreTweets alert with number of new tweets
+              $moreTweets
+                .html('You have <strong>' + (newTweetCount - originalTweetCount) + '</strong> new tweets. Click to show them.');
+            }
+
+            setTimeout(function() {
+              checkForTweets(counter());
+            }, Math.random() * 8000);
+          };
+
+          function filterByUser(user) {
+            var tweets = $('.tweet');
+
+            for (var j = 0; j < tweets.length; j++) {
+              var currentUser = tweets.eq(j).find('.user').text().trim();
+              if (currentUser !== user) {
+                tweets.eq(j).slideUp();
+              }
+            }
+            $clearFilter.slideDown();
+          };
+
+          function clearFilter() {
+            $('.tweet').css('display', 'block');
+            $clearFilter.css('display', 'none');
+          }
+
+          return {
+            counter: counter,
+            displayIndividualTweet: displayIndividualTweet,
+            displayNewTweets: displayNewTweets,
+            checkForTweets: checkForTweets,
+            filterByUser: filterByUser,
+            clearFilter: clearFilter
+          };
+        })();
+
+        // Save DOM elements
+        var $tweetContainer = $('#tweet-container');
+        var $moreTweets = $('#more-tweets');
+        var $clearFilter = $('#clear-filter');
+
+        var newTweetCount = 0;
+        var originalTweetCount = tweetEvents.counter();
+
+        // Initialize empty object to hold reading statuses for all tweets
+        var read = {};
+
+        // Start index at the original number of tweets
         var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
+
+        // Display first 10 tweets on page load
+        while (index >= 0) {
+          var newTweet = tweetEvents.displayIndividualTweet(index);
+
+          // Mark tweets as read
+          read[index] = true;
+
+          // Decrement index
           index -= 1;
         }
+
+        // Start checking for new tweets
+        tweetEvents.checkForTweets();
+
+        $moreTweets.click(function() {
+          tweetEvents.displayNewTweets();
+        });
+
+        $('.tweet').click(function() {
+          var user = $(this).find('.user').text().trim();
+          tweetEvents.filterByUser(user);
+        });
+
+        $clearFilter.click(function() {
+          tweetEvents.clearFilter();
+        });
 
       });
 
