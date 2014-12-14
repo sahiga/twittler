@@ -52,7 +52,7 @@ body {
 }
 
 a {
-  color: rgba(0, 132, 180, 1);
+  color: rgb(0, 132, 180);
   text-decoration: none;
   cursor: pointer;
 }
@@ -67,10 +67,42 @@ strong, .user {
 
 header {
   padding: 1em;
+  position: relative;
 }
 
 h1 {
   font-size: 2em;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+input, textarea, button {
+  display: inline-block;
+  padding: 0.5em 1em;
+  border: 1px solid rgba(0, 132, 180, 0.5);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+}
+
+.btn {
+  color: #fff;
+  cursor: pointer;
+  background: rgb(0, 121, 165);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+button:hover {
+  opacity: 0.5;
 }
 
 .alerts {
@@ -81,7 +113,7 @@ h1 {
   opacity: 0;
   padding: 1em;
   display: block;
-  border-bottom: 1px dotted rgba(0, 132, 180, 0.5);
+  border-top: 1px dotted rgba(0, 132, 180, 0.5);
 }
 
 .blue {
@@ -94,7 +126,6 @@ h1 {
   padding: 0.5em 1em;
   background: #ffffcc;
   border-top: 1px solid rgb(255, 240, 158);
-  border-bottom: 1px solid rgb(255, 240, 158);
 }
 
 #clear-filter {
@@ -103,21 +134,34 @@ h1 {
   right: 0;
   top: 0;
   margin: 0.5em;
-  padding: 0.2em 0.8em;
   font-size: 0.7em;
-  color: #fff;
-  cursor: pointer;
-  background: rgba(0, 132, 180, 1);
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
 }
 
-.date {
+.smalltext {
   font-size: 0.7em;
 }
 
 .message {
   font-weight: 300;
   font-size: 1.4em;
+}
+
+#tweet-writer {
+  display: none;
+  position: relative;
+  padding: 2em;
+  background: rgb(225, 219, 255);
+  border-top: 1px dotted rgb(174, 158, 255);
+}
+
+.close-btn {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 1em;
+  top: 2em;
 }

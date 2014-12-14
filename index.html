@@ -2,8 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="utf8">
-    <script src="jquery.js"></script>
-    <script src="data_generator.js"></script>
     <link href="twittler.css" rel="stylesheet" type="text/css" />
     <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet" type="text/css">
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
@@ -11,14 +9,34 @@
   <body>
     <header>
       <h1><span class="fa fa-twitter"></span> Twittler</h1>
+      <button class="btn tweet-writer-control toggle-btn"><span class="fa fa-pencil-square-o"></span> Write a tweet</button>
     </header>
+    <section id="tweet-writer">
+      <h2>Write a tweet</h2>
+      <a class="fa fa-times close-btn tweet-writer-control"></a>
+      <div class="row">
+        <label for="visitorInput">username</label>
+        <input type="text" id="visitorInput" name="visitorInput"></input>
+      </div>
+      <div class="row">
+        <label for="message">message</label>
+        <textarea id="message" name="message"></textarea>
+      </div>
+      <button id="send-tweet" class="btn">Tweet it!</button>
+    </section>
     <section class="alerts">
       <div id="more-tweets">Waiting for new tweets...</div>
-      <div id="clear-filter"><span class="fa fa-times"></span> Clear user filter</div>
+      <button id="clear-filter" class="btn"><span class="fa fa-times"></span> Clear user filter</button>
     </section>
     <section id="tweet-container">
     </section>
+    <script src="jquery.js"></script>
+    <script src="data_generator.js"></script>
+    <script src="jquery.timeago.js"></script>
     <script type="text/javascript">
+      // Initialize global property visitor
+      window.visitor;
+
       $(document).ready(function(){
 
         var tweetEvents = (function() {
@@ -40,7 +58,7 @@
 
             // Color odd rows blue
             for (var j = 0; j < tweets.length; j++) {
-              if (j % 2 !== 0) {
+              if (j % 2 === 0) {
                 tweets.eq(j).addClass('blue');
               } else {
                 tweets.eq(j).removeClass('blue');
@@ -51,8 +69,8 @@
           // Add a tweet to the DOM
           function displayIndividualTweet(number) {
             var tweet = streams.home[number];
-            var $tweet = $('<div class="tweet"><p class="date">' +
-            tweet.created_at + '</p><p class="message">' + tweet.message +
+            var $tweet = $('<div class="tweet"><p class="date smalltext">' +
+            $.timeago(tweet.created_at) + '</p><p class="message">' + tweet.message +
             '</p><p class="posted-by">&mdash; <a class="user">@' +
             tweet.user + '</a></div>');
 
@@ -154,6 +172,7 @@
         var $tweetContainer = $('#tweet-container');
         var $moreTweets = $('#more-tweets');
         var $clearFilter = $('#clear-filter');
+        var $tweetWriter = $('#tweet-writer');
 
         // Initialize the two tweet count variables
         var newTweetCount = 0;
@@ -194,6 +213,33 @@
         // Clear user filter when $clearFilter button is clicked
         $clearFilter.click(function() {
           tweetEvents.clearFilter();
+        });
+
+
+        // Toggle the tweet writer box
+        $('.tweet-writer-control').click(function() {
+          if ($tweetWriter.css('display') === 'block') {
+            $tweetWriter.slideUp();
+          } else {
+            $tweetWriter.slideDown();
+          }
+        });
+
+        // When visitor clicks write tweet button
+        $('#send-tweet').click(function() {
+          // Update the global visitor property
+          visitor = $('#visitorInput').val();
+          // Grab the visitor's message
+          var message = $('#message').val();
+          // If neither is empty
+          if (visitor.length && message.length) {
+            // Add a stream for the visitor
+            streams.users[visitor] = [];
+            // Send the visitor's tweet
+            writeTweet(message);
+            // Save the visitor's tweet
+            $tweetWriter.append('<p class="smalltext">Your tweet has been saved</p>');
+          }
         });
       });
     </script>
